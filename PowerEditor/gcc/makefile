@@ -25,6 +25,8 @@ SRC_EXCLUDE := $(SRC_DIRECTORY)/tools/%
 BIN_DIRECTORY := ../bin
 INSTALLER_DIRECTORY := ../installer
 
+PREBUILD_EVENT_CMD := NppLibsVersionH-generator.bat
+
 TARGET_BINARY := notepad++.exe
 SRC_DATA := contextMenu.xml langs.model.xml shortcuts.xml stylers.model.xml tabContextMenu_example.xml toolbarIcons.xml
 BIN_DATA := change.log doLocalConf.xml nppLogNulContentCorruptionIssue.xml readme.txt userDefineLangs/
@@ -182,6 +184,7 @@ ifeq "$(WIN_DIR)" ""
 MKDIR := mkdir -p
 CPDIR := cp -r
 RMDIR := rm -rf
+DIR := ls -l
 CP := cp
 RM := rm -f
 normalize-path = $1
@@ -193,6 +196,7 @@ SHELL_DIRECTORY := $(subst |,$(SPACE),$(dir $(subst $(SPACE),|,$(SHELL))))
 MKDIR := $(SHELL_DIRECTORY)mkdir.exe -p
 CPDIR := $(SHELL_DIRECTORY)cp.exe -r
 RMDIR := $(SHELL_DIRECTORY)rm.exe -rf
+DIR := $(SHELL_DIRECTORY)ls -l
 CP := $(SHELL_DIRECTORY)cp.exe
 RM := $(SHELL_DIRECTORY)rm.exe -f
 normalize-path = $1
@@ -201,6 +205,7 @@ else
 MKDIR := mkdir
 CPDIR := xcopy /q /e /i /y
 RMDIR := rmdir /q /s
+DIR := dir
 CP := copy /y
 RM := del /q
 normalize-path = $(subst /,\,$1)
@@ -230,8 +235,13 @@ RC_TARGETS := $(patsubst %.rc,$(BUILD_DIRECTORY)/%.res,$(sort $(filter %.rc,$(GC
 
 SUBMAKEFLAGS += $(if $(NUMBER_OF_PROCESSORS),-j$(NUMBER_OF_PROCESSORS),)
 
-all: $(SCINTILLA_TARGET) $(LEXILLA_TARGET)
+all: pre-build-event $(SCINTILLA_TARGET) $(LEXILLA_TARGET)
 	$(AT)$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(SUBMAKEFLAGS) binary
+
+pre-build-event:
+	@echo Executing pre-build events...
+	@$(DIR)
+	$(AT)$(call normalize-path,$(SRC_DIRECTORY)/$(PREBUILD_EVENT_CMD))
 
 $(BUILD_DIRECTORY):
 	@echo + creating BUILD_DIRECTORY $@
