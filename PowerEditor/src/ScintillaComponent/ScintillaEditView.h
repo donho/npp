@@ -91,9 +91,13 @@ const int CP_GREEK = 1253;
 
 const bool fold_expand = true;
 const bool fold_collapse = false;
+
 #define MAX_FOLD_COLLAPSE_LEVEL	8
 
 #define MODEVENTMASK_OFF 0
+
+#define MAX_FOLD_LINES_MORE_THAN 99
+
 
 enum TextCase : UCHAR
 {
@@ -454,6 +458,7 @@ public:
 
 	void activateBuffer(BufferID buffer, bool force);
 
+	void scrollCaret() const noexcept;
 	void getCurrentFoldStates(std::vector<size_t> & lineStateVector);
 	void syncFoldStateWith(const std::vector<size_t> & lineStateVectorNew);
 
@@ -776,15 +781,16 @@ public:
 	};
 
 	bool isFoldIndentationBased() const;
+	intptr_t getHeaderLine(intptr_t line = -1) const noexcept;
 	void collapseFoldIndentationBased(int level2Collapse, bool mode);
 	void collapse(int level2Collapse, bool mode);
-	void foldAll(bool mode);
-	void fold(size_t line, bool mode);
+	void foldAll(size_t mode, bool isNotify = true);
+	void fold(intptr_t headerLine, bool mode, bool isNotify = true);
 	bool isFolded(size_t line) const {
 		return (execute(SCI_GETFOLDEXPANDED, line) != 0);
 	};
-	bool isCurrentLineFolded() const;
-	void foldCurrentPos(bool mode);
+	bool isCurrentLineFolded(intptr_t headerLine = -1) const noexcept;
+	void foldCurrentPos(intptr_t headerLine = -1, bool mode = false);
 	int getCodepage() const {return _codepage;};
 
 	ColumnModeInfos getColumnModeSelectInfo();

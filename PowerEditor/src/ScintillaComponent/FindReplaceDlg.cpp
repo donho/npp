@@ -5720,13 +5720,13 @@ intptr_t CALLBACK Finder::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam
 
 				case NPPM_INTERNAL_SCINTILLAFINDERCOLLAPSE :
 				{
-					_scintView.foldAll(fold_collapse);
+					_scintView.foldAll(fold_collapse, false);
 					return TRUE;
 				}
 
 				case NPPM_INTERNAL_SCINTILLAFINDERUNCOLLAPSE :
 				{
-					_scintView.foldAll(fold_expand);
+					_scintView.foldAll(fold_expand, false);
 					return TRUE;
 				}
 
